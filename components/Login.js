@@ -1,15 +1,17 @@
 import React, { useState, Component } from 'react';
-import { View, TextInput, StyleSheet, Button, Modal, AsyncStorage, StatusBar } from 'react-native'
+import { View, TextInput, StyleSheet, Button, Modal, AsyncStorage, StatusBar, TouchableOpacity, Text } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './Home';
 
 const test = {username:'test', password:'123'}
-
+const userURL = `http://localhost:3000/users`
+const loginURL = `http://localhost:3000/login`
 export default class Login extends Component{
     state={
         username:'',
-        password:''
+        password:'',
+        visible: true
     }
     static navigationOptions = {
         header: null
@@ -17,7 +19,7 @@ export default class Login extends Component{
     
     render(){
         return( 
-            <Modal visible={this.props.showLogin} animationType='slide'>
+            <Modal visible={this.state.visible} animationType='slide'>
                 <StatusBar backgroundColor='#1e90ff' barStyle='light-content'/>
                 <View style={styles.login}>
                     <TextInput style={styles.input} placeholder="Enter Username"
@@ -28,8 +30,11 @@ export default class Login extends Component{
                     value={this.state.password} secureTextEntry={true} onChangeText={(password)=> this.setState({password})}/>
 
                     <View style={styles.button}>
-                        <Button title='Cancel' color='red' onPress={this.props.cancelLogin}/>
-                        <Button title='Submit' onPress={this.signin}/>
+                        {/* <Button title='Cancel' color='red' onPress={this.setState({visible: false})}/> */}
+                        <TouchableOpacity
+                            onPress={this.signin}>
+                            <Text style={{backgroundColor: 'red'}}>Login</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -38,6 +43,9 @@ export default class Login extends Component{
     signin = async() => {
         if(test.username === this.state.username && test.password === this.state.password){
             alert('Logged In');
+            await AsyncStorage.setItem('Loggedin', '1')
+            this.props.navigation.navigate('Home')
+
         }else{
             alert('Username or password are incorrect!')
         }
